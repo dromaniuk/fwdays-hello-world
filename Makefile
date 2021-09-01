@@ -1,5 +1,6 @@
 VERSION := $(shell date +'%y%m%d.%H%M%S.0')
 IMAGE := localhost:32000/fwdays/hello-world:${VERSION}
+RELEASE := project1
 
 all: build push
 
@@ -14,7 +15,7 @@ push:
 	docker push ${IMAGE}
 
 install:
-	helm install project1 .
+	helm install ${RELEASE} .
 
 update:
-	helm upgrade project1 .
+	helm upgrade ${RELEASE} .
