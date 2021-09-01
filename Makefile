@@ -1,4 +1,4 @@
-VERSION := $(shell date +'%y%m%d.%H%M%S')
+VERSION := $(shell date +'%y%m%d.%H%M%S.0')
 IMAGE := localhost:32000/fwdays/hello-world:${VERSION}
 
 all: build push
