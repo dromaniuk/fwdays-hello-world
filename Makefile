@@ -17,5 +17,5 @@ push:
 install:
 	helm install ${RELEASE} .
 
-update:
+upgrade:
 	helm upgrade ${RELEASE} .
