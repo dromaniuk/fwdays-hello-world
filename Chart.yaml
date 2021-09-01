@@ -1,0 +1,10 @@
+apiVersion: v2
+type: application
+name: fwdays-2021-hello-world
+description: fwdays sample project
+version: 210901.143529
+appVersion: 210901.143529
+dependencies: []
+maintainers: 
+  - name: Denis Romaniuk
+    email: denis.romaniuk@example.com

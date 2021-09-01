@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ $.Release.Namespace | quote }}
+  name: {{ include "releasename" $ | quote }}
+  labels: {{- include "labels" $ | nindent 4 }}
+  annotations: {{- toYaml $.Values.annotations | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "matchLabels" $ | nindent 6 }}
+  replicas: {{ int $.Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+  revisionHistoryLimit: 3
+
+  template:
+    metadata:
+      labels: {{- include "labels" $ | nindent 8 }}
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
+      nodeSelector: {{- toYaml $.Values.nodeSelector | nindent 8 }}
+      tolerations: {{- toYaml $.Values.tolerations | nindent 8 }}
+      affinity: {{- toYaml $.Values.affinity | nindent 8 }}
+      securityContext: {{- toYaml $.Values.securityContext | nindent 8 }}
+      imagePullSecrets: {{- toYaml $.Values.imagePullSecrets | nindent 8 }}
+      containers:
+
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: {{ $.Values.podImagePullPolicy | quote }}
+          resources: {{ toYaml $.Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            {{- toYaml $.Values.probes.readiness | nindent 12 }}
+            httpGet:
+              port: http
+              path: /
+          livenessProbe:
+            {{- toYaml $.Values.probes.liveness | nindent 12 }}
+            httpGet:
+              port: http
+              path: /
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+
+        - name: php-fpm
+          image: localhost:32000/fwdays/hello-world:{{ $.Chart.AppVersion }}
+          imagePullPolicy: {{ $.Values.podImagePullPolicy | quote }}
+          resources: {{ toYaml $.Values.resources | nindent 12 }}
+          ports:
+            - name: php-fpm
+              containerPort: 9000
+          readinessProbe:
+            {{- toYaml $.Values.probes.readiness | nindent 12 }}
+            tcpSocket:
+              port: php-fpm
+          livenessProbe:
+            {{- toYaml $.Values.probes.liveness | nindent 12 }}
+            tcpSocket:
+              port: php-fpm
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ printf "%s-nginx" (include "releasename" .) | quote }}
+

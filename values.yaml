@@ -1,0 +1,72 @@
+# Додаткові анотації до Deployment
+annotations: {}
+# Кількість реплік
+replicaCount: 1
+# Політика скачування образу
+# "IfNotPresent" - буде скачуватись тільки якщо образа немає на ноді
+# "Always" - образ буде скачуватись кожен раз при створенні поду
+imagePullPolicy: Always
+# Назви Secret'ів в яких лежать доступа до Image Registry
+# Актуально для запаролених registry
+imagePullSecrets: []
+# Селектор, по якому Kubernetes обирає на яку ноду класти додаток
+nodeSelector: {}
+# Список Taints, які можна ігнорувати
+tolerations: []
+# Правила розміщення подів по кластеру
+affinity: {}
+# Контекст, під яким додаток повинен запускатись (user і група в системі на ноді)
+securityContext: {}
+  # fsGroup: 472
+  # runAsGroup: 472
+  # runAsNonRoot: true
+  # runAsUser: 472
+# Ресурси, виділені контейнеру додадка
+resources: {}
+  # limits:
+  #   cpu: 500m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 200m
+  #   memory: 128Mi
+# If a PreStop hook hangs during execution, the Pod's phase will be Terminating and remain there until the Pod is killed after its terminationGracePeriodSeconds expires.
+# Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+terminationGracePeriodSeconds: 5
+probes:
+  # Секція перевірки готовності пода
+  # По ній куб визначає чи можна пускати трафік на под
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 15
+    failureThreshold: 3
+    successThreshold: 1
+  # Секція перевірки чи под живий
+  # По ній куб визначає коли потрібно рестартувати пода
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+service:
+  # Флаг ввімкнення Service'у
+  enabled: true
+  # Додаткові аннотації до сервісу
+  annotations: {}
+  # Назва сервісу
+  name: hello-world
+  # Порт сервісу
+  port: 80
+  # Розподілення викликів між 
+  # Если указано "ClientIP", то запросы от одного и того же клиента будут отправляться на один и тот же под
+  # Если указано "None", то запросы будут распределяться на разные поды.
+  sessionAffinity: None
+# Настройки Ingress
+ingress:
+  # Флаг включения Ingress'а
+  enabled: true
+  # Домен который обслуживается на Ingress
+  domain: hello-world.example.com
+  # Аннотации к Ingress'у
+  annotations: {}
