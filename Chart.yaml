@@ -1,6 +1,6 @@
 apiVersion: v2
 type: application
-name: fwdays-2021-hello-world
+name: fwdays_2021_hello_world
 description: fwdays sample project
 version: 210901.143529
 appVersion: 210901.143529
